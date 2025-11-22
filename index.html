@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cards — Netflix Background Effect</title>
+
+  <style>
+    /* ================== ОСНОВА СТРАНИЦЫ ================== */
+    body {
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: sans-serif;
+      position: relative;
+      overflow: hidden; 
+    }
+
+    /* ================== ФОН Netflix-стиля ==================
+       Делаем через ::before, чтобы управлять scale + opacity */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: url("https://images.unsplash.com/photo-1520523839897-bd5615fdfb56");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+
+      /* БАЗОВОЕ СОСТОЯНИЕ */
+      transform: scale(1);
+      opacity: 1;
+
+      /* ПЛАВНЫЙ NETFLIX-transition */
+      transition:
+        transform 0.65s cubic-bezier(0.11, 0.6, 0.15, 1),
+        opacity 0.45s ease-in-out;
+
+      z-index: 0;
+    }
+
+    /* ================== АКТИВНОЕ СОСТОЯНИЕ ==================
+       Точно как Netflix: чуть темнее + зум */
+    body.netflix-active::before {
+      transform: scale(1.1);
+      opacity: 0.35; /* затемнение через прозрачность */
+    }
+
+    /* ================== КОНТЕЙНЕР С КАРТОЧКАМИ ================== */
+    .cards {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 30px;
+      max-width: 1100px;
+      width: 100%;
+    }
+
+    /* ================== КАРТОЧКА ================== */
+    .card {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      background: #222;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .card--active {
+      box-shadow: 0 20px 36px rgba(0, 0, 0, 0.55);
+    }
+
+    /* ================== КАРТИНКА ВНУТРИ КАРТОЧКИ ================== */
+    .card__image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: filter 0.4s ease;
+    }
+
+    /* затемнение картинки при открытии */
+    .card--active .card__image {
+      filter: brightness(0.45);
+    }
+
+    /* ================== ФРОНТ-ТЕКСТ ================== */
+    .card__front {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    /* ================== КОНТЕНТ, КОТОРЫЙ ВЫЕЗЖАЕТ ================== */
+    .card__content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 22px;
+      background: rgba(0, 0, 0, 0.65);
+      color: #fff;
+      gap: 12px;
+      transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .card__heading {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .card__text {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.5;
+      max-width: 90%;
+    }
+
+    /* ================== НАПРАВЛЕНИЕ АНИМАЦИИ ================== */
+
+    .card--from-bottom .card__content { transform: translateY(100%); }
+    .card--from-bottom.card--active .card__content { transform: translateY(0); }
+    .card--from-bottom.card--active .card__front { opacity: 0; transform: translateY(-20%); }
+
+    .card--from-top .card__content { transform: translateY(-100%); }
+    .card--from-top.card--active .card__content { transform: translateY(0); }
+    .card--from-top.card--active .card__front { opacity: 0; transform: translateY(20%); }
+
+    .card--from-left .card__content { transform: translateX(-100%); }
+    .card--from-left.card--active .card__content { transform: translateX(0); }
+    .card--from-left.card--active .card__front { opacity: 0; transform: translateX(20%); }
+
+    .card--from-right .card__content { transform: translateX(100%); }
+    .card--from-right.card--active .card__content { transform: translateX(0); }
+    .card--from-right.card--active .card__front { opacity: 0; transform: translateX(-20%); }
+
+  </style>
+</head>
+
+<body>
+  <div class="cards">
+
+    <div class="card card--from-bottom" tabindex="0">
+      <img class="card__image" src="https://picsum.photos/id/1011/600" alt="" />
+      <div class="card__front">Снизу ↑</div>
+      <div class="card__content">
+        <p class="card__heading">From Bottom</p>
+        <p class="card__text">Lorem ipsum is simply dummy text.</p>
+      </div>
+    </div>
+
+    <div class="card card--from-top" tabindex="0">
+      <img class="card__image" src="https://picsum.photos/id/1025/600" alt="" />
+      <div class="card__front">Сверху ↓</div>
+      <div class="card__content">
+        <p class="card__heading">From Top</p>
+        <p class="card__text">Lorem ipsum is simply dummy text.</p>
+      </div>
+    </div>
+
+    <div class="card card--from-left" tabindex="0">
+      <img class="card__image" src="https://picsum.photos/id/1035/600" alt="" />
+      <div class="card__front">Слева →</div>
+      <div class="card__content">
+        <p class="card__heading">From Left</p>
+        <p class="card__text">Lorem ipsum is simply dummy text.</p>
+      </div>
+    </div>
+
+    <div class="card card--from-right" tabindex="0">
+      <img class="card__image" src="https://picsum.photos/id/1043/600" alt="" />
+      <div class="card__front">Справа ←</div>
+      <div class="card__content">
+        <p class="card__heading">From Right</p>
+        <p class="card__text">Lorem ipsum is simply dummy text.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const cards = document.querySelectorAll('.card');
+    const body = document.body;
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        const alreadyActive = card.classList.contains('card--active');
+
+        // Если закрываем открытую карточку
+        if (alreadyActive) {
+          card.classList.remove('card--active');
+
+          // Проверяем — остались ли открытые?
+          const anyOpen = [...cards].some(c => c.classList.contains('card--active'));
+          if (!anyOpen) body.classList.remove('netflix-active');
+
+          return;
+        }
+
+        // Закрываем другие
+        cards.forEach(other => other.classList.remove('card--active'));
+
+        // Открываем текущую
+        card.classList.add('card--active');
+
+        // Включаем эффект Netflix
+        body.classList.add('netflix-active');
+      });
+
+      // Поддержка Enter
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') card.click();
+      });
+    });
+  </script>
+</body>
+</html>
+
+
